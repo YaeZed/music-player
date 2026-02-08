@@ -3,7 +3,7 @@ import type { RawTrack, TrackDetailResponse } from "@/types/api/track.type"
 import request from "../request"
 /**
  * 获取歌曲详情
- * @params ids - 歌曲id（单个或多个，逗号分隔）
+ * @params ids - 歌曲id
  */
 const getTrackDetail = async (ids: number | string): Promise<Track[]> => {
     // 调用api

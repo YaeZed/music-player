@@ -11,6 +11,7 @@ import { Howl } from "howler";
 export class AudioService {
     private howler: Howl | null = null;
     private currentUrl: string = "";
+    private progressTimer: number | null = null;
 
     /**
      * 播放音频
@@ -71,6 +72,38 @@ export class AudioService {
     }
 
     /**
+   * 开始监听播放进度
+   * @param callback - 进度回调函数（每秒调用一次）
+   */
+    startProgressTracking(
+        callback: (currentTime: number, duration: number) => void
+    ): void {
+        // 1.先停止监听
+        this.stopProgressTracking();
+
+        const update = () => {
+            if (this.howler && this.howler.playing()) {
+                const currentTime = this.getCurrentTime()
+                const duration = this.getDuration()
+                callback(currentTime, duration)
+
+                // 2.递归调用，实现持续监听
+                this.progressTimer = requestAnimationFrame(update)
+            } else if (this.howler && !this.howler.playing()) {
+                // 如果暂停了，也继续请求，知道被stop
+                this.progressTimer = requestAnimationFrame(update)
+            }
+        }
+
+        this.progressTimer = requestAnimationFrame(update)
+    }
+    stopProgressTracking(): void {
+        if (this.progressTimer !== null) {
+            cancelAnimationFrame(this.progressTimer)
+            this.progressTimer == null
+        }
+    }
+    /**
      * 暂停播放
      */
     pause(): void {
@@ -125,6 +158,13 @@ export class AudioService {
     }
 
     /**
+     * 获取时长（秒）
+     */
+    getDuration(): number {
+        return this.howler?.duration() ?? 0;
+    }
+
+    /**
      * 跳转到指定时间
      * @param time - 时间（秒）
      */
@@ -138,6 +178,7 @@ export class AudioService {
      * 卸载音频实例
      */
     unload(): void {
+        this.stopProgressTracking() // 清理定时器
         if (this.howler) {
             this.howler.unload();
             this.howler = null;

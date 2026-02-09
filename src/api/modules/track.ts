@@ -1,5 +1,5 @@
 import type { Track } from "@/types/entities/track"
-import type { RawTrack, TrackDetailResponse } from "@/types/api/track.type"
+import type { LyricResponse, RawTrack, TrackDetailResponse } from "@/types/api/track.type"
 import request from "../request"
 /**
  * 获取歌曲详情
@@ -45,4 +45,18 @@ const getTrackUrl = async (id: number) => {
     return res.data[0]?.url || null;
 }
 
-export { getTrackDetail, getTrackUrl }
+/**
+ * 获取歌词
+ * @param id - 歌曲 ID
+ */
+const getTrackLyric = async (id: number): Promise<string> => {
+    const res = await request.get<any, LyricResponse>("/lyric", {
+        params: { id }
+    })
+
+    if (!res.lrc || !res.lrc.lyric) {
+        throw new Error("歌词不存在");
+    }
+    return res.lrc.lyric;
+}
+export { getTrackDetail, getTrackUrl, getTrackLyric }

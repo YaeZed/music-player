@@ -1,29 +1,30 @@
 <template>
-  <div>
-    <button @click="play">{{ buttonTxt }}</button>
+  <div id="app">
+    <Home />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { usePlayerStore } from "./stores/modules/player";
-
-const playerStore = usePlayerStore();
-const buttonTxt = computed(() => {
-  if (playerStore.playing) {
-    return "⏹️";
-  } else {
-    return "▶️";
-  }
-});
-const play = () => {
-  playerStore
-    .playTrack(123456)
-    .then(() => console.log("播放成功"))
-    .catch((err) => console.log("播放失败", err));
-};
-console.log("播放中:", playerStore.playing);
-console.log("当前歌曲:", playerStore.currentTrackName);
+import Home from "./views/Home.vue";
 </script>
 
-<style scoped></style>
+<style scoped>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", sans-serif;
+  background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+  min-height: 100vh;
+}
+
+#app {
+  min-height: 100vh;
+  padding: 20px;
+}
+</style>

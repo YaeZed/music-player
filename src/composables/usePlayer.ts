@@ -1,27 +1,50 @@
+import { usePlayerStore } from "@/stores/modules/player"
+import { storeToRefs } from "pinia"
+
 /**
  * 播放器 Composable
- * 为组件提供简洁的播放器api
+ *
+ * - 为组件提供简洁的 API（不需要直接操作 Store）
+ * - 统一管理 Store 的引用和方法
+ * - 方便在多个组件中复用
  */
-
-import { usePlayerStore } from "@/stores/modules/player"
-import { storeToRefs } from "pinia";
-
 export const usePlayer = () => {
-    const playerStore = usePlayerStore();
+    const playerStore = usePlayerStore()
 
-    // 解构状态
-    const { playing, currentTrack, progress } = storeToRefs(playerStore)
+    // 使用storeToRefs解构state
+    const {
+        playing,
+        loading,
+        currentTrack,
+        errorMessage,
+        currentTrackName,
+        currentArtists,
+        currentTime,
+        duration,
+        progress
+    } = storeToRefs(playerStore);
 
-    // 方法
-    const { playTrack, pause, resume } = playerStore;
+    // 解构方法
+    const { playTrack, pause, resume, togglePlay, stop, seekTo } = playerStore;
 
     return {
+        // State（响应式）
         playing,
+        loading,
         currentTrack,
+        errorMessage,
+        currentTrackName,
+        currentArtists,
+        currentTime,
+        duration,
         progress,
-        play: playTrack,
-        pause,
-        resume
-    }
-}
 
+        // Actions
+        playTrack,
+        pause,
+        resume,
+        togglePlay,
+        stop,
+        seekTo
+    };
+}

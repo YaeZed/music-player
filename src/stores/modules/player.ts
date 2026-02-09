@@ -17,6 +17,8 @@ export const usePlayerStore = defineStore("player", () => {
     const loading = ref(false) // 加载状态
     const currentTrack = ref<Track | null>(null);// 当前歌曲
     const errorMessage = ref("")// 错误信息
+    const currentTime = ref(0) // 当前播放时间（秒）
+    const duration = ref(0) // 歌曲时长
 
     //getters
     // 当前歌曲id
@@ -29,6 +31,12 @@ export const usePlayerStore = defineStore("player", () => {
     const currentArtists = computed(() => {
         if (!currentTrack.value) return ""
         return currentTrack.value.artists.map((a) => a.name).join(" / ");
+    })
+
+    // 进度百分比
+    const progress = computed(() => {
+        if (duration.value === 0) return 0
+        return (currentTime.value / duration.value) * 100
     })
 
     //actions
@@ -57,6 +65,7 @@ export const usePlayerStore = defineStore("player", () => {
                 const track = tracks[0]
                 if (track) {
                     currentTrack.value = track
+                    duration.value = track.duration / 1000
                     // 2.获取播放url
                     const url = await getTrackUrl(track.id)
                     console.log("✅ [PlayerStore] Play URL loaded:", url);
@@ -64,6 +73,11 @@ export const usePlayerStore = defineStore("player", () => {
                     await audioService.play(url)
                     playing.value = true
                     console.log("🎉 [PlayerStore] Now playing:", track.name);
+                    // 4.监听进度
+                    audioService.startProgressTracking((current, dur) => {
+                        currentTime.value = current
+                        duration.value = dur
+                    })
                 }
             }
         } catch (error: any) {
@@ -81,6 +95,7 @@ export const usePlayerStore = defineStore("player", () => {
      */
     const pause = () => {
         audioService.pause();
+        audioService.stopProgressTracking()
         playing.value = false
         console.log("⏸️ [PlayerStore] Paused");
 
@@ -90,6 +105,10 @@ export const usePlayerStore = defineStore("player", () => {
     */
     const resume = () => {
         audioService.resume();
+        audioService.startProgressTracking((current, dur) => {
+            currentTime.value = current
+            duration.value = dur
+        })
         playing.value = true;
         console.log("▶️ [PlayerStore] Resumed");
     }
@@ -108,8 +127,20 @@ export const usePlayerStore = defineStore("player", () => {
      */
     const stop = () => {
         audioService.stop();
+        audioService.stopProgressTracking()
         playing.value = false;
+        currentTime.value = 0;
         console.log("⏹️ [PlayerStore] Stopped");
+    }
+
+    /**
+  * 跳转到指定时间
+  * @param time - 时间（秒）
+  */
+    function seekTo(time: number) {
+        audioService.seek(time);
+        currentTime.value = time;
+        console.log("⏩ [PlayerStore] Seeked to:", time);
     }
 
     return {
@@ -117,15 +148,19 @@ export const usePlayerStore = defineStore("player", () => {
         loading,
         currentTrack,
         errorMessage,
+        currentTime,
+        duration,
 
         currentTrackId,
         currentTrackName,
         currentArtists,
+        progress,
 
         playTrack,
         pause,
         resume,
         togglePlay,
         stop,
+        seekTo
     };
 })

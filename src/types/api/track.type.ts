@@ -22,4 +22,14 @@ interface RawTrack {
     dt: number;
 }
 
-export type { TrackDetailResponse, RawTrack }
+interface LyricResponse {
+    code: number;
+    lrc?: {
+        lyric: string // lrc格式歌词
+    };
+    tlyric?: {
+        lyric: string // 翻译歌词
+    }
+}
+
+export type { TrackDetailResponse, RawTrack, LyricResponse }

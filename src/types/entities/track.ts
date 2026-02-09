@@ -15,8 +15,17 @@ interface Track {
     artists: Artist[];
     album: Album;
     duration: number;
-    // ...其他字段
 }
 
-export type { Track, Artist, Album }
+// 歌词行
+interface LyricLine {
+    time: number;
+    text: string
+}
+// 歌词数据
+interface Lyric {
+    lines: LyricLine[]
+}
+
+export type { Track, Artist, Album, Lyric, LyricLine }
 

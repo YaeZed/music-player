@@ -1,3 +1,6 @@
+/**
+ * 歌曲类型定义
+ */
 interface Artist {
     id: number;
     name: string;

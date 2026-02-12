@@ -23,4 +23,34 @@ const formatDuration = (ms: number): string => {
     return formatTime(ms / 1000)
 }
 
-export { formatTime, formatDuration }
+/**
+ * 格式化播放次数
+ * @param count - 播放次数
+ * @returns 格式化后的字符串（如：1.2万、10.5亿）
+ */
+const formatPlayCount = (count: number): string => {
+    if (count < 10000) {
+        return count.toString();
+    }
+
+    if (count < 100000000) {
+        return (count / 10000).toFixed(1) + "万";
+    }
+
+    return (count / 100000000).toFixed(1) + "亿";
+}
+
+const getAlbumType = (album: { type: string; size: number }): string => {
+    if (album.type === "EP/Single") {
+        return album.size === 1 ? "Single" : "EP";
+    }
+    if (album.type === "Single") {
+        return "Single";
+    }
+    if (album.type === "专辑") {
+        return "Album";
+    }
+    return album.type;
+}
+
+export { formatTime, formatDuration, formatPlayCount, getAlbumType }

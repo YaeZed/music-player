@@ -1,4 +1,4 @@
-// 网易云api返回的格式
+// 网易云api返回的歌曲格式
 interface TrackDetailResponse {
     code: number;
     songs: RawTrack[];

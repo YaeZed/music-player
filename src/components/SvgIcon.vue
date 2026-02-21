@@ -1,5 +1,5 @@
 <template>
-  <svg :class="svgClass" :style="svgStyle" aria-hidden="true">
+  <svg :class="iconClass" :style="svgStyle" aria-hidden="true">
     <use :href="iconName"></use>
   </svg>
 </template>
@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
 // 计算属性
 const iconName = computed(() => `#icon-${props.iconClass}`);
 
-const svgClass = computed(() => {
+const iconClass = computed(() => {
   if (props.className) {
     return `svg-icon ${props.className}`;
   }

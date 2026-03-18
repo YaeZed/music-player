@@ -3,74 +3,62 @@
  * 管理应用设置，包括主题切换
  */
 
-import i18n from "@/locale";
 import { defineStore } from "pinia";
 import { ref, watch } from "vue";
+import i18n from "@/locale"; // 假设你已有 i18n 实例
 
 export const useSettingsStore = defineStore('settings', () => {
-    // 主题
-    const theme = ref<'light' | 'dark'>("light")
-    // 语言
+    // --- 状态 (State) ---
+
+    const theme = ref<'light' | 'dark'>(localStorage.getItem("theme") as any ?? "light")
     const lang = ref<string>(localStorage.getItem('lang') ?? 'zh-CN')
 
-    // actions
-    /**
-    * 初始化主题
-   * 从 localStorage 读取用户上次选择的主题
-   */
+    // Apple Music 显示开关：直接定义，默认开启
+    const showPlaylistsByAppleMusic = ref<boolean>(
+        localStorage.getItem('showPlaylistsByAppleMusic') === 'false' ? false : true
+    )
+
+    // --- 逻辑 (Actions) ---
+
     const initTheme = () => {
-        // 1.从localStorage中读取
-        const savedTheme = localStorage.getItem("theme") as "light" | 'dark';
-
-        // 2.如果有保存的主题，使用保存的，否则使用系统偏好
-        if (savedTheme) {
-            theme.value = savedTheme
-        } else {
-            // 检查系统偏好
-            const prefersDark = window.matchMedia(
-                '(prefers-color-scheme: dark)'
-            ).matches;
-            theme.value = prefersDark ? "dark" : "light";
-
-            // 3.应用主题
-            applyTheme(theme.value)
-            console.log(`🎨 [Settings] Theme initialized: ${theme.value}`);
-        }
+        const savedTheme = localStorage.getItem("theme") as "light" | "dark";
+        const targetTheme = savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? "dark" : "light");
+        theme.value = targetTheme;
+        applyTheme(targetTheme);
     }
 
-    /**
-   * 应用主题到 DOM
-   */
-    const applyTheme = (newThme: 'light' | 'dark') => {
-        //  获取文档的根元素，也就是 <html> 标签
-        document.documentElement.setAttribute('data-theme', newThme)
+    const applyTheme = (newTheme: 'light' | 'dark') => {
+        document.documentElement.setAttribute('data-theme', newTheme);
     }
 
-    /**
-   * 切换主题
-   */
     const toggleTheme = () => {
-        theme.value = theme.value === "light" ? "dark" : "light"
-        console.log(`🎨 [Settings] Theme toggled to: ${theme.value}`);
+        theme.value = theme.value === "light" ? "dark" : "light";
     }
 
-    // 监听主题变化，自动保存并应用
-    watch(theme, (newThme) => {
-        localStorage.setItem("theme", newThme)
-        applyTheme(newThme)
+    const setLang = (newLang: 'zh-CN' | 'en' | 'zh-TW' | 'tr') => {
+        lang.value = newLang;
+        // 注意：i18n v9+ 语法的更新
+        (i18n.global.locale as any).value = newLang;
+        localStorage.setItem('lang', newLang);
+    }
+
+    // --- 监听状态自动持久化 (Watchers) ---
+
+    // 监听 Apple Music 显隐设置
+    watch(showPlaylistsByAppleMusic, (newValue) => {
+        localStorage.setItem('showPlaylistsByAppleMusic', String(newValue));
     })
 
-    // 设置语言
-    const setLang = (newLang: 'zh-CN' | 'en' | 'zh-TW' | 'tr'
-    ) => {
-        lang.value = newLang
-        i18n.global.locale.value = newLang // 同步切换i18n语言
-        localStorage.setItem('lang', newLang)
-    }
+    // 监听主题并应用渲染
+    watch(theme, (newTheme) => {
+        localStorage.setItem("theme", newTheme);
+        applyTheme(newTheme);
+    })
 
     return {
         theme,
         lang,
+        showPlaylistsByAppleMusic, // 导出供组件使用
         initTheme,
         toggleTheme,
         setLang

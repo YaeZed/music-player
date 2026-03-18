@@ -17,8 +17,9 @@ interface PlaylistCreator {
 interface Playlist {
     id: number;
     name: string;
-    coverImgUrl: string; // 封面图片
-    picUrl: string;
+    coverImgUrl?: string; // 封面图片
+    picUrl?: string;
+    img1v1Url?: string
     playCount?: number; // 播放次数
     trackCount?: number; // 歌曲数量
     creator?: PlaylistCreator; // 创建者

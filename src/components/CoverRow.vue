@@ -10,7 +10,7 @@
         :id="item.id"
         :image-url="getImageUrl(item)"
         :type="props.type"
-        :play-button-size="props.type === 'artist' ? 22 : props.playButtonSize"
+        :play-button-size="props.type === 'artist' ? 26 : props.playButtonSize"
       />
       <div class="text">
         <div v-if="showPlayCount" class="info">

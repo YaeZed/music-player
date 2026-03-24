@@ -1,8 +1,4 @@
 /**
- * 歌手类型定义
- */
-
-/**
  * 歌手信息
  */
 export interface Artist {

@@ -16,7 +16,7 @@ import type {
  * 获取推荐歌单（未登录用户）
  * @param limit - 数量限制
  */
-const getRecommentPlayList = async (limit: number = 30): Promise<Playlist[]> => {
+const getRecommendPlayList = async (limit: number = 30): Promise<Playlist[]> => {
     const res = await request.get<any, RecommendPlaylistResponse>("/personalized", {
         params: { limit }
     })
@@ -41,7 +41,6 @@ const getDailyRecommendPlaylist = async (): Promise<Playlist[]> => {
 /**
  * 获取所有榜单
  */
-
 const getTopList = async (): Promise<Playlist[]> => {
     const res = await request.get<any, TopListsResponse>("/toplist");
 
@@ -70,4 +69,4 @@ const transformPlaylist = (raw: RawPlaylist): Playlist => {
     };
 }
 
-export { getRecommentPlayList, getDailyRecommendPlaylist, getTopList }
+export { getRecommendPlayList, getDailyRecommendPlaylist, getTopList }
